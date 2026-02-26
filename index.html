@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Аккаунты</title>
+    <!-- Telegram WebApp SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: var(--tg-theme-bg-color, #f8f9fa);
+            color: var(--tg-theme-text-color, #1c1e21);
+            padding: 16px;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--tg-theme-accent-text-color, #2481cc);
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--tg-theme-hint-color, #65676b);
+            margin-bottom: 24px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            flex: 1 0 auto;
+            padding: 10px 16px;
+            background: var(--tg-theme-secondary-bg-color, #e9ecef);
+            border: none;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--tg-theme-text-color, #1c1e21);
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .tab.active {
+            background: var(--tg-theme-button-color, #40a7e3);
+            color: var(--tg-theme-button-text-color, #ffffff);
+        }
+
+        .tab.admin-only {
+            position: relative;
+        }
+        .tab.admin-only::after {
+            content: "👑";
+            position: absolute;
+            top: -4px;
+            right: 4px;
+            font-size: 12px;
+        }
+
+        .card {
+            background: var(--tg-theme-secondary-bg-color, #ffffff);
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 1px solid var(--tg-theme-section-separator-color, rgba(0,0,0,0.05));
+            backdrop-filter: blur(10px);
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        .account-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--tg-theme-section-separator-color, #dee2e6);
+        }
+
+        .account-item:last-child {
+            border-bottom: none;
+        }
+
+        .account-info {
+            flex: 1;
+        }
+
+        .account-phone {
+            font-weight: 600;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .account-note {
+            font-size: 13px;
+            color: var(--tg-theme-hint-color, #65676b);
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 600;
+            background: rgba(64,167,227,0.1);
+            color: var(--tg-theme-accent-text-color, #2481cc);
+            margin-right: 6px;
+        }
+
+        .badge.safe-on {
+            background: rgba(52,199,89,0.15);
+            color: #2c9b4f;
+        }
+
+        .badge.safe-off {
+            background: rgba(255,59,48,0.1);
+            color: #d93025;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .btn {
+            background: var(--tg-theme-button-color, #40a7e3);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border: none;
+            border-radius: 30px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn:active {
+            transform: scale(0.96);
+        }
+
+        .btn.secondary {
+            background: var(--tg-theme-secondary-bg-color, #e9ecef);
+            color: var(--tg-theme-text-color, #1c1e21);
+            border: 1px solid var(--tg-theme-section-separator-color, #ced4da);
+        }
+
+        .btn.small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn.icon {
+            padding: 8px;
+            border-radius: 50%;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 4px;
+            color: var(--tg-theme-hint-color, #65676b);
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--tg-theme-section-separator-color, #ced4da);
+            border-radius: 30px;
+            background: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #1c1e21);
+            font-size: 16px;
+            outline: none;
+            transition: border 0.2s;
+        }
+
+        .input-field:focus {
+            border-color: var(--tg-theme-button-color, #40a7e3);
+        }
+
+        .flex {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .mt-4 {
+            margin-top: 16px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--tg-theme-hint-color, #65676b);
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--tg-theme-section-separator-color, #dee2e6);
+            border-top-color: var(--tg-theme-button-color, #40a7e3);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: var(--tg-theme-bg-color, #ffffff);
+            border-radius: 30px;
+            padding: 24px;
+            max-width: 90%;
+            width: 400px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .modal h3 {
+            margin-bottom: 16px;
+            font-size: 20px;
+        }
+
+        .close-btn {
+            float: right;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--tg-theme-destructive-text-color, #ff3b30);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 30px;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: none;
+            z-index: 2000;
+        }
+
+        .toast.success {
+            background: #34c759;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: var(--tg-theme-bg-color, #1c1e21);
+                color: var(--tg-theme-text-color, #f0f0f0);
+            }
+            .card {
+                background: var(--tg-theme-secondary-bg-color, #2c2e33);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎭 Управление аккаунтами</h1>
+        <div class="subtitle" id="user-greeting">Загрузка...</div>
+
+        <!-- Вкладки -->
+        <div class="tabs" id="tabs">
+            <button class="tab active" data-tab="accounts">📱 Аккаунты</button>
+            <button class="tab" data-tab="nakrut">📈 Накрутка</button>
+            <button class="tab admin-only" data-tab="prank" id="prank-tab" style="display: none;">🎭 Пранк</button>
+            <button class="tab" data-tab="settings">⚙️ Настройки</button>
+        </div>
+
+        <!-- Контейнеры для контента вкладок -->
+        <div id="accounts-tab" class="tab-content active">
+            <div class="flex" style="justify-content: space-between; margin-bottom: 16px;">
+                <span id="accounts-count">0 аккаунтов</span>
+                <button class="btn small" id="add-account-btn">➕ Добавить</button>
+            </div>
+            <div id="accounts-list"></div>
+            <div id="accounts-empty" class="empty-state" style="display: none;">
+                <p>У вас пока нет аккаунтов</p>
+                <button class="btn" id="empty-add">➕ Добавить первый аккаунт</button>
+            </div>
+        </div>
+
+        <div id="nakrut-tab" class="tab-content" style="display: none;">
+            <div class="card">
+                <h3>📢 Накрутка каналов</h3>
+                <p>Подписка на каналы с ваших аккаунтов.</p>
+                <div class="input-group">
+                    <label>Ссылки на каналы (каждая с новой строки)</label>
+                    <textarea id="channels-input" class="input-field" rows="3" placeholder="https://t.me/channel&#10;@channel2"></textarea>
+                </div>
+                <div class="input-group">
+                    <label>Количество аккаунтов</label>
+                    <input type="number" id="channels-count" class="input-field" min="1" value="1">
+                </div>
+                <button class="btn" id="start-channel-nakrut">🚀 Запустить</button>
+            </div>
+            <div class="card">
+                <h3>🤖 Накрутка ботов</h3>
+                <p>Запуск /start от имени аккаунтов.</p>
+                <div class="input-group">
+                    <label>Ссылка на бота</label>
+                    <input type="text" id="bot-link" class="input-field" placeholder="@mybot">
+                </div>
+                <div class="input-group">
+                    <label>Количество аккаунтов</label>
+                    <input type="number" id="bot-count" class="input-field" min="1" value="1">
+                </div>
+                <button class="btn" id="start-bot-nakrut">🤖 Запустить</button>
+            </div>
+        </div>
+
+        <div id="prank-tab" class="tab-content" style="display: none;">
+            <div class="card">
+                <h3>🔌 Управление прокси</h3>
+                <p>Всего прокси: <span id="proxies-count">0</span></p>
+                <div class="flex">
+                    <button class="btn small" id="show-proxies">👁 Показать</button>
+                    <button class="btn small" id="add-proxies-btn">➕ Добавить</button>
+                    <button class="btn small" id="clear-proxies">🗑 Очистить</button>
+                </div>
+                <pre id="proxies-list" style="margin-top: 12px; background: var(--tg-theme-secondary-bg-color); padding: 8px; border-radius: 8px; font-size: 12px; max-height: 150px; overflow: auto;"></pre>
+            </div>
+            <div class="card">
+                <h3>📞 Запустить пранк</h3>
+                <div class="input-group">
+                    <label>Номер телефона</label>
+                    <input type="text" id="prank-phone" class="input-field" placeholder="+79123456789">
+                </div>
+                <div class="input-group">
+                    <label>Количество запросов</label>
+                    <input type="number" id="prank-count" class="input-field" min="1" value="1">
+                </div>
+                <button class="btn" id="start-prank">🎭 Запустить</button>
+            </div>
+        </div>
+
+        <div id="settings-tab" class="tab-content" style="display: none;">
+            <div class="card">
+                <h3>⚙️ Основные настройки</h3>
+                <div class="input-group">
+                    <label>Уведомления безопасного режима</label>
+                    <button class="btn small" id="toggle-safe-notifications">🔔 Включены</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для добавления аккаунта -->
+    <div class="modal-overlay" id="add-account-modal">
+        <div class="modal">
+            <span class="close-btn" id="close-modal">&times;</span>
+            <h3>➕ Добавить аккаунт</h3>
+            <div class="input-group">
+                <label>Номер телефона (международный формат)</label>
+                <input type="text" id="new-phone" class="input-field" placeholder="+79123456789">
+            </div>
+            <div class="flex" style="justify-content: flex-end;">
+                <button class="btn secondary" id="cancel-modal">Отмена</button>
+                <button class="btn" id="confirm-add-account">Добавить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для заметки -->
+    <div class="modal-overlay" id="note-modal">
+        <div class="modal">
+            <span class="close-btn" id="close-note-modal">&times;</span>
+            <h3>📝 Заметка</h3>
+            <div class="input-group">
+                <textarea id="note-text" class="input-field" rows="4" placeholder="Введите текст заметки..."></textarea>
+            </div>
+            <div class="flex" style="justify-content: flex-end;">
+                <button class="btn secondary" id="delete-note-btn">🗑 Удалить</button>
+                <button class="btn" id="save-note-btn">💾 Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для прокси -->
+    <div class="modal-overlay" id="proxies-modal">
+        <div class="modal">
+            <span class="close-btn" id="close-proxies-modal">&times;</span>
+            <h3>🔌 Добавить прокси</h3>
+            <div class="input-group">
+                <label>Список прокси (IP PORT с новой строки)</label>
+                <textarea id="proxies-text" class="input-field" rows="5" placeholder="107.152.98.5 4145&#10;192.252.220.89 4145"></textarea>
+            </div>
+            <div class="flex" style="justify-content: flex-end;">
+                <button class="btn" id="save-proxies-btn">Добавить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Тосты -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // развернуть на весь экран
+        tg.ready();
+
+        // Определяем тему
+        const colorScheme = tg.colorScheme;
+        document.body.style.background = tg.themeParams.bg_color;
+        document.body.style.color = tg.themeParams.text_color;
+
+        let userId = tg.initDataUnsafe?.user?.id || 0;
+        let isAdmin = (userId === 1672727647); // ADMIN_ID из бота
+        let currentAccountPhone = null; // для заметок
+
+        // Элементы
+        const userGreeting = document.getElementById('user-greeting');
+        userGreeting.innerText = `Привет, ${tg.initDataUnsafe?.user?.first_name || 'пользователь'}!`;
+
+        if (isAdmin) {
+            document.getElementById('prank-tab').style.display = 'block';
+        }
+
+        // Переключение вкладок
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const target = tab.dataset.tab;
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                tabContents.forEach(content => content.style.display = 'none');
+                document.getElementById(target + '-tab').style.display = 'block';
+                if (target === 'accounts') loadAccounts();
+                if (target === 'prank' && isAdmin) loadProxiesInfo();
+            });
+        });
+
+        // Загрузка аккаунтов
+        async function loadAccounts() {
+            showLoading('accounts-list');
+            sendCommand('get_accounts', {});
+        }
+
+        // Отправка команды в бот
+        function sendCommand(command, params = {}) {
+            const data = JSON.stringify({cmd: command, ...params});
+            tg.sendData(data);
+            // Будет ответ через onEvent('answerWebAppQuery')
+        }
+
+        // Обработка ответа от бота
+        tg.onEvent('answerWebAppQuery', (event) => {
+            const data = JSON.parse(event.data);
+            if (data.error) {
+                showToast(data.error, 'error');
+                return;
+            }
+            switch (data.cmd) {
+                case 'get_accounts':
+                    renderAccounts(data.accounts);
+                    break;
+                case 'account_info':
+                    // Можно обновить конкретный аккаунт
+                    break;
+                case 'proxies_info':
+                    renderProxies(data.proxies);
+                    break;
+                case 'settings_info':
+                    updateSettings(data.settings);
+                    break;
+                default:
+                    if (data.success) {
+                        showToast(data.message || 'Успешно!', 'success');
+                        loadAccounts(); // перезагружаем список
+                    }
+            }
+        });
+
+        // Рендер списка аккаунтов
+        function renderAccounts(accounts) {
+            const listEl = document.getElementById('accounts-list');
+            const emptyEl = document.getElementById('accounts-empty');
+            const countSpan = document.getElementById('accounts-count');
+            countSpan.innerText = `${accounts.length} аккаунтов`;
+
+            if (!accounts || accounts.length === 0) {
+                listEl.innerHTML = '';
+                emptyEl.style.display = 'block';
+                return;
+            }
+            emptyEl.style.display = 'none';
+
+            let html = '';
+            accounts.forEach(acc => {
+                const safeClass = acc.safe_mode ? 'safe-on' : 'safe-off';
+                const safeText = acc.safe_mode ? '🛡️ ВКЛ' : '⚪ ВЫКЛ';
+                const noteIcon = acc.note ? '📝' : '';
+                const notePreview = acc.note ? acc.note.substring(0, 20) + (acc.note.length > 20 ? '…' : '') : '';
+
+                html += `
+                    <div class="account-item" data-phone="${acc.phone}">
+                        <div class="account-info">
+                            <div class="account-phone">
+                                <span class="badge ${safeClass}">${safeText}</span>
+                                ${acc.phone}
+                                ${noteIcon ? '<span class="badge">' + noteIcon + '</span>' : ''}
+                            </div>
+                            ${notePreview ? '<div class="account-note">📄 ' + notePreview + '</div>' : ''}
+                        </div>
+                        <div class="actions">
+                            <button class="btn small toggle-safe" data-phone="${acc.phone}">${acc.safe_mode ? '🔓' : '🔒'}</button>
+                            <button class="btn small note" data-phone="${acc.phone}">📝</button>
+                            <button class="btn small delete" data-phone="${acc.phone}">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            });
+            listEl.innerHTML = html;
+
+            // Обработчики кнопок аккаунтов
+            document.querySelectorAll('.toggle-safe').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const phone = btn.dataset.phone;
+                    sendCommand('toggle_safe', {phone});
+                });
+            });
+            document.querySelectorAll('.note').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const phone = btn.dataset.phone;
+                    currentAccountPhone = phone;
+                    // Загрузить текущую заметку?
+                    document.getElementById('note-text').value = '';
+                    document.getElementById('note-modal').style.display = 'flex';
+                });
+            });
+            document.querySelectorAll('.delete').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const phone = btn.dataset.phone;
+                    if (confirm('Удалить аккаунт?')) {
+                        sendCommand('delete_account', {phone});
+                    }
+                });
+            });
+        }
+
+        // Добавление аккаунта
+        document.getElementById('add-account-btn').addEventListener('click', () => {
+            document.getElementById('add-account-modal').style.display = 'flex';
+        });
+        document.getElementById('empty-add').addEventListener('click', () => {
+            document.getElementById('add-account-modal').style.display = 'flex';
+        });
+        document.getElementById('close-modal').addEventListener('click', () => {
+            document.getElementById('add-account-modal').style.display = 'none';
+        });
+        document.getElementById('cancel-modal').addEventListener('click', () => {
+            document.getElementById('add-account-modal').style.display = 'none';
+        });
+        document.getElementById('confirm-add-account').addEventListener('click', () => {
+            const phone = document.getElementById('new-phone').value.trim();
+            if (!phone) {
+                showToast('Введите номер телефона', 'error');
+                return;
+            }
+            sendCommand('add_account', {phone});
+            document.getElementById('add-account-modal').style.display = 'none';
+            document.getElementById('new-phone').value = '';
+        });
+
+        // Заметка
+        document.getElementById('close-note-modal').addEventListener('click', () => {
+            document.getElementById('note-modal').style.display = 'none';
+        });
+        document.getElementById('save-note-btn').addEventListener('click', () => {
+            const note = document.getElementById('note-text').value.trim();
+            if (currentAccountPhone) {
+                sendCommand('set_note', {phone: currentAccountPhone, note});
+            }
+            document.getElementById('note-modal').style.display = 'none';
+        });
+        document.getElementById('delete-note-btn').addEventListener('click', () => {
+            if (currentAccountPhone) {
+                if (confirm('Удалить заметку?')) {
+                    sendCommand('set_note', {phone: currentAccountPhone, note: ''});
+                }
+            }
+            document.getElementById('note-modal').style.display = 'none';
+        });
+
+        // Накрутка
+        document.getElementById('start-channel-nakrut').addEventListener('click', () => {
+            const channels = document.getElementById('channels-input').value.trim().split('\n').filter(l => l.trim());
+            const count = parseInt(document.getElementById('channels-count').value);
+            if (!channels.length) { showToast('Введите каналы', 'error'); return; }
+            sendCommand('nakrut_channel', {channels, count});
+        });
+        document.getElementById('start-bot-nakrut').addEventListener('click', () => {
+            const bot = document.getElementById('bot-link').value.trim();
+            const count = parseInt(document.getElementById('bot-count').value);
+            if (!bot) { showToast('Введите ссылку на бота', 'error'); return; }
+            sendCommand('nakrut_bot', {bot, count});
+        });
+
+        // Прокси (админ)
+        function loadProxiesInfo() {
+            sendCommand('get_proxies', {});
+        }
+        document.getElementById('show-proxies').addEventListener('click', loadProxiesInfo);
+        document.getElementById('add-proxies-btn').addEventListener('click', () => {
+            document.getElementById('proxies-modal').style.display = 'flex';
+        });
+        document.getElementById('close-proxies-modal').addEventListener('click', () => {
+            document.getElementById('proxies-modal').style.display = 'none';
+        });
+        document.getElementById('save-proxies-btn').addEventListener('click', () => {
+            const text = document.getElementById('proxies-text').value.trim();
+            sendCommand('add_proxies', {proxies: text});
+            document.getElementById('proxies-modal').style.display = 'none';
+            document.getElementById('proxies-text').value = '';
+        });
+        document.getElementById('clear-proxies').addEventListener('click', () => {
+            if (confirm('Очистить все прокси?')) {
+                sendCommand('clear_proxies', {});
+            }
+        });
+
+        function renderProxies(proxies) {
+            const listEl = document.getElementById('proxies-list');
+            document.getElementById('proxies-count').innerText = proxies.length;
+            if (proxies.length === 0) {
+                listEl.innerText = 'Нет прокси';
+                return;
+            }
+            let text = '';
+            proxies.forEach((p, i) => {
+                const total = (p.success_count || 0) + (p.fail_count || 0);
+                const rate = total ? ((p.success_count / total) * 100).toFixed(1) : '?';
+                text += `${i+1}. ${p.ip}:${p.port} (✅${p.success_count||0} ❌${p.fail_count||0} ${rate}%)\n`;
+            });
+            listEl.innerText = text;
+        }
+
+        // Пранк (админ)
+        document.getElementById('start-prank').addEventListener('click', () => {
+            const phone = document.getElementById('prank-phone').value.trim();
+            const count = parseInt(document.getElementById('prank-count').value);
+            if (!phone) { showToast('Введите номер', 'error'); return; }
+            sendCommand('start_prank', {phone, count});
+        });
+
+        // Настройки
+        document.getElementById('toggle-safe-notifications').addEventListener('click', () => {
+            sendCommand('toggle_safe_notifications', {});
+        });
+
+        function updateSettings(settings) {
+            const btn = document.getElementById('toggle-safe-notifications');
+            btn.innerText = settings.safe_notifications ? '🔔 Включены' : '🔕 Выключены';
+        }
+
+        // Загрузка при старте
+        loadAccounts();
+
+        // Вспомогательные функции
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.className = 'toast ' + (type === 'success' ? 'success' : '');
+            toast.innerText = message;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+        }
+
+        function showLoading(containerId) {
+            document.getElementById(containerId).innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+        }
+
+        // Закрытие модалок по клику вне
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-overlay')) {
+                e.target.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
