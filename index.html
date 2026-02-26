@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telegram Аккаунты</title>
-    <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -13,39 +12,33 @@
             box-sizing: border-box;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
-
         body {
             background: var(--tg-theme-bg-color, #f8f9fa);
             color: var(--tg-theme-text-color, #1c1e21);
             padding: 16px;
             transition: background 0.2s, color 0.2s;
         }
-
         .container {
             max-width: 600px;
             margin: 0 auto;
         }
-
         h1 {
             font-size: 24px;
             font-weight: 600;
             margin-bottom: 8px;
             color: var(--tg-theme-accent-text-color, #2481cc);
         }
-
         .subtitle {
             font-size: 14px;
             color: var(--tg-theme-hint-color, #65676b);
             margin-bottom: 24px;
         }
-
         .tabs {
             display: flex;
             gap: 8px;
             margin-bottom: 24px;
             flex-wrap: wrap;
         }
-
         .tab {
             flex: 1 0 auto;
             padding: 10px 16px;
@@ -59,12 +52,10 @@
             transition: 0.2s;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
-
         .tab.active {
             background: var(--tg-theme-button-color, #40a7e3);
             color: var(--tg-theme-button-text-color, #ffffff);
         }
-
         .tab.admin-only {
             position: relative;
         }
@@ -75,7 +66,6 @@
             right: 4px;
             font-size: 12px;
         }
-
         .card {
             background: var(--tg-theme-secondary-bg-color, #ffffff);
             border-radius: 20px;
@@ -86,11 +76,9 @@
             backdrop-filter: blur(10px);
             transition: transform 0.2s;
         }
-
         .card:hover {
             transform: translateY(-2px);
         }
-
         .account-item {
             display: flex;
             align-items: center;
@@ -98,15 +86,12 @@
             padding: 12px 0;
             border-bottom: 1px solid var(--tg-theme-section-separator-color, #dee2e6);
         }
-
         .account-item:last-child {
             border-bottom: none;
         }
-
         .account-info {
             flex: 1;
         }
-
         .account-phone {
             font-weight: 600;
             font-size: 16px;
@@ -114,7 +99,6 @@
             align-items: center;
             gap: 6px;
         }
-
         .account-note {
             font-size: 13px;
             color: var(--tg-theme-hint-color, #65676b);
@@ -123,7 +107,6 @@
             align-items: center;
             gap: 4px;
         }
-
         .badge {
             display: inline-block;
             padding: 4px 8px;
@@ -134,23 +117,19 @@
             color: var(--tg-theme-accent-text-color, #2481cc);
             margin-right: 6px;
         }
-
         .badge.safe-on {
             background: rgba(52,199,89,0.15);
             color: #2c9b4f;
         }
-
         .badge.safe-off {
             background: rgba(255,59,48,0.1);
             color: #d93025;
         }
-
         .actions {
             display: flex;
             gap: 8px;
             align-items: center;
         }
-
         .btn {
             background: var(--tg-theme-button-color, #40a7e3);
             color: var(--tg-theme-button-text-color, #ffffff);
@@ -166,38 +145,31 @@
             gap: 4px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
-
         .btn:active {
             transform: scale(0.96);
         }
-
         .btn.secondary {
             background: var(--tg-theme-secondary-bg-color, #e9ecef);
             color: var(--tg-theme-text-color, #1c1e21);
             border: 1px solid var(--tg-theme-section-separator-color, #ced4da);
         }
-
         .btn.small {
             padding: 6px 12px;
             font-size: 12px;
         }
-
         .btn.icon {
             padding: 8px;
             border-radius: 50%;
         }
-
         .input-group {
             margin-bottom: 16px;
         }
-
         .input-group label {
             display: block;
             font-size: 14px;
             margin-bottom: 4px;
             color: var(--tg-theme-hint-color, #65676b);
         }
-
         .input-field {
             width: 100%;
             padding: 12px 16px;
@@ -209,34 +181,28 @@
             outline: none;
             transition: border 0.2s;
         }
-
         .input-field:focus {
             border-color: var(--tg-theme-button-color, #40a7e3);
         }
-
         .flex {
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
             align-items: center;
         }
-
         .mt-4 {
             margin-top: 16px;
         }
-
         .empty-state {
             text-align: center;
             padding: 40px 20px;
             color: var(--tg-theme-hint-color, #65676b);
         }
-
         .loading {
             display: flex;
             justify-content: center;
             padding: 40px;
         }
-
         .spinner {
             width: 40px;
             height: 40px;
@@ -245,11 +211,9 @@
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
-
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -263,7 +227,6 @@
             justify-content: center;
             z-index: 1000;
         }
-
         .modal {
             background: var(--tg-theme-bg-color, #ffffff);
             border-radius: 30px;
@@ -272,18 +235,15 @@
             width: 400px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.3);
         }
-
         .modal h3 {
             margin-bottom: 16px;
             font-size: 20px;
         }
-
         .close-btn {
             float: right;
             font-size: 24px;
             cursor: pointer;
         }
-
         .toast {
             position: fixed;
             bottom: 20px;
@@ -298,11 +258,9 @@
             display: none;
             z-index: 2000;
         }
-
         .toast.success {
             background: #34c759;
         }
-
         @media (prefers-color-scheme: dark) {
             body {
                 background: var(--tg-theme-bg-color, #1c1e21);
@@ -319,7 +277,6 @@
         <h1>🎭 Управление аккаунтами</h1>
         <div class="subtitle" id="user-greeting">Загрузка...</div>
 
-        <!-- Вкладки -->
         <div class="tabs" id="tabs">
             <button class="tab active" data-tab="accounts">📱 Аккаунты</button>
             <button class="tab" data-tab="nakrut">📈 Накрутка</button>
@@ -327,7 +284,6 @@
             <button class="tab" data-tab="settings">⚙️ Настройки</button>
         </div>
 
-        <!-- Контейнеры для контента вкладок -->
         <div id="accounts-tab" class="tab-content active">
             <div class="flex" style="justify-content: space-between; margin-bottom: 16px;">
                 <span id="accounts-count">0 аккаунтов</span>
@@ -405,7 +361,6 @@
         </div>
     </div>
 
-    <!-- Модальное окно для добавления аккаунта -->
     <div class="modal-overlay" id="add-account-modal">
         <div class="modal">
             <span class="close-btn" id="close-modal">&times;</span>
@@ -421,7 +376,6 @@
         </div>
     </div>
 
-    <!-- Модальное окно для заметки -->
     <div class="modal-overlay" id="note-modal">
         <div class="modal">
             <span class="close-btn" id="close-note-modal">&times;</span>
@@ -436,7 +390,6 @@
         </div>
     </div>
 
-    <!-- Модальное окно для прокси -->
     <div class="modal-overlay" id="proxies-modal">
         <div class="modal">
             <span class="close-btn" id="close-proxies-modal">&times;</span>
@@ -451,26 +404,18 @@
         </div>
     </div>
 
-    <!-- Тосты -->
     <div class="toast" id="toast"></div>
 
     <script>
         const tg = window.Telegram.WebApp;
-        tg.expand(); // развернуть на весь экран
+        tg.expand();
         tg.ready();
 
-        // Определяем тему
-        const colorScheme = tg.colorScheme;
-        document.body.style.background = tg.themeParams.bg_color;
-        document.body.style.color = tg.themeParams.text_color;
-
         let userId = tg.initDataUnsafe?.user?.id || 0;
-        let isAdmin = (userId === 1672727647); // ADMIN_ID из бота
-        let currentAccountPhone = null; // для заметок
+        let isAdmin = (userId === 1672727647);
+        let currentAccountPhone = null;
 
-        // Элементы
-        const userGreeting = document.getElementById('user-greeting');
-        userGreeting.innerText = `Привет, ${tg.initDataUnsafe?.user?.first_name || 'пользователь'}!`;
+        document.getElementById('user-greeting').innerText = `Привет, ${tg.initDataUnsafe?.user?.first_name || 'пользователь'}!`;
 
         if (isAdmin) {
             document.getElementById('prank-tab').style.display = 'block';
@@ -491,48 +436,54 @@
             });
         });
 
-        // Загрузка аккаунтов
-        async function loadAccounts() {
+        function loadAccounts() {
             showLoading('accounts-list');
             sendCommand('get_accounts', {});
         }
 
-        // Отправка команды в бот
         function sendCommand(command, params = {}) {
             const data = JSON.stringify({cmd: command, ...params});
             tg.sendData(data);
-            // Будет ответ через onEvent('answerWebAppQuery')
         }
 
-        // Обработка ответа от бота
         tg.onEvent('answerWebAppQuery', (event) => {
             const data = JSON.parse(event.data);
+            console.log('Ответ от бота:', data);
             if (data.error) {
                 showToast(data.error, 'error');
                 return;
             }
             switch (data.cmd) {
                 case 'get_accounts':
-                    renderAccounts(data.accounts);
+                    renderAccounts(data.accounts || []);
                     break;
-                case 'account_info':
-                    // Можно обновить конкретный аккаунт
+                case 'toggle_safe':
+                case 'set_note':
+                case 'delete_account':
+                case 'add_account':
+                    if (data.success) {
+                        showToast(data.message, 'success');
+                        loadAccounts();
+                    }
                     break;
                 case 'proxies_info':
-                    renderProxies(data.proxies);
+                    renderProxies(data.proxies || []);
                     break;
-                case 'settings_info':
-                    updateSettings(data.settings);
+                case 'nakrut_progress':
+                case 'prank_progress':
+                    updateProgress(data);
+                    break;
+                case 'nakrut_complete':
+                case 'prank_complete':
+                    showToast(`Завершено! Успешно: ${data.success}, ошибок: ${data.fail}`, 'success');
                     break;
                 default:
                     if (data.success) {
                         showToast(data.message || 'Успешно!', 'success');
-                        loadAccounts(); // перезагружаем список
                     }
             }
         });
 
-        // Рендер списка аккаунтов
         function renderAccounts(accounts) {
             const listEl = document.getElementById('accounts-list');
             const emptyEl = document.getElementById('accounts-empty');
@@ -573,7 +524,6 @@
             });
             listEl.innerHTML = html;
 
-            // Обработчики кнопок аккаунтов
             document.querySelectorAll('.toggle-safe').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const phone = btn.dataset.phone;
@@ -584,7 +534,6 @@
                 btn.addEventListener('click', () => {
                     const phone = btn.dataset.phone;
                     currentAccountPhone = phone;
-                    // Загрузить текущую заметку?
                     document.getElementById('note-text').value = '';
                     document.getElementById('note-modal').style.display = 'flex';
                 });
@@ -599,7 +548,6 @@
             });
         }
 
-        // Добавление аккаунта
         document.getElementById('add-account-btn').addEventListener('click', () => {
             document.getElementById('add-account-modal').style.display = 'flex';
         });
@@ -623,7 +571,6 @@
             document.getElementById('new-phone').value = '';
         });
 
-        // Заметка
         document.getElementById('close-note-modal').addEventListener('click', () => {
             document.getElementById('note-modal').style.display = 'none';
         });
@@ -643,7 +590,6 @@
             document.getElementById('note-modal').style.display = 'none';
         });
 
-        // Накрутка
         document.getElementById('start-channel-nakrut').addEventListener('click', () => {
             const channels = document.getElementById('channels-input').value.trim().split('\n').filter(l => l.trim());
             const count = parseInt(document.getElementById('channels-count').value);
@@ -657,7 +603,6 @@
             sendCommand('nakrut_bot', {bot, count});
         });
 
-        // Прокси (админ)
         function loadProxiesInfo() {
             sendCommand('get_proxies', {});
         }
@@ -696,7 +641,6 @@
             listEl.innerText = text;
         }
 
-        // Пранк (админ)
         document.getElementById('start-prank').addEventListener('click', () => {
             const phone = document.getElementById('prank-phone').value.trim();
             const count = parseInt(document.getElementById('prank-count').value);
@@ -704,20 +648,14 @@
             sendCommand('start_prank', {phone, count});
         });
 
-        // Настройки
         document.getElementById('toggle-safe-notifications').addEventListener('click', () => {
             sendCommand('toggle_safe_notifications', {});
         });
 
-        function updateSettings(settings) {
-            const btn = document.getElementById('toggle-safe-notifications');
-            btn.innerText = settings.safe_notifications ? '🔔 Включены' : '🔕 Выключены';
+        function updateProgress(data) {
+            showToast(`${data.cmd}: ${data.progress} (✅${data.success} ❌${data.fail})`, 'info');
         }
 
-        // Загрузка при старте
-        loadAccounts();
-
-        // Вспомогательные функции
         function showToast(message, type = 'info') {
             const toast = document.getElementById('toast');
             toast.className = 'toast ' + (type === 'success' ? 'success' : '');
@@ -730,12 +668,14 @@
             document.getElementById(containerId).innerHTML = '<div class="loading"><div class="spinner"></div></div>';
         }
 
-        // Закрытие модалок по клику вне
         window.addEventListener('click', (e) => {
             if (e.target.classList.contains('modal-overlay')) {
                 e.target.style.display = 'none';
             }
         });
+
+        // Загружаем аккаунты при старте
+        loadAccounts();
     </script>
 </body>
 </html>
