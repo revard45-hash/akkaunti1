@@ -6,6 +6,7 @@
     <title>Telegram Аккаунты</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        /* Стили остаются без изменений (как в предыдущих версиях) */
         * {
             margin: 0;
             padding: 0;
@@ -443,44 +444,50 @@
 
         function sendCommand(command, params = {}) {
             const data = JSON.stringify({cmd: command, ...params});
+            console.log('Отправка данных:', data);
             tg.sendData(data);
         }
 
-        tg.onEvent('answerWebAppQuery', (event) => {
-            const data = JSON.parse(event.data);
-            console.log('Ответ от бота:', data);
-            if (data.error) {
-                showToast(data.error, 'error');
-                return;
-            }
-            switch (data.cmd) {
-                case 'get_accounts':
-                    renderAccounts(data.accounts || []);
-                    break;
-                case 'toggle_safe':
-                case 'set_note':
-                case 'delete_account':
-                case 'add_account':
-                    if (data.success) {
-                        showToast(data.message, 'success');
-                        loadAccounts();
-                    }
-                    break;
-                case 'proxies_info':
-                    renderProxies(data.proxies || []);
-                    break;
-                case 'nakrut_progress':
-                case 'prank_progress':
-                    updateProgress(data);
-                    break;
-                case 'nakrut_complete':
-                case 'prank_complete':
-                    showToast(`Завершено! Успешно: ${data.success}, ошибок: ${data.fail}`, 'success');
-                    break;
-                default:
-                    if (data.success) {
-                        showToast(data.message || 'Успешно!', 'success');
-                    }
+        // ИСПРАВЛЕННЫЙ ОБРАБОТЧИК: используем событие 'message'
+        tg.onEvent('message', (event) => {
+            console.log('Получено сообщение от бота:', event);
+            try {
+                const data = JSON.parse(event.data);
+                if (data.error) {
+                    showToast(data.error, 'error');
+                    return;
+                }
+                switch (data.cmd) {
+                    case 'get_accounts':
+                        renderAccounts(data.accounts || []);
+                        break;
+                    case 'toggle_safe':
+                    case 'set_note':
+                    case 'delete_account':
+                    case 'add_account':
+                        if (data.success) {
+                            showToast(data.message, 'success');
+                            loadAccounts();
+                        }
+                        break;
+                    case 'proxies_info':
+                        renderProxies(data.proxies || []);
+                        break;
+                    case 'nakrut_progress':
+                    case 'prank_progress':
+                        updateProgress(data);
+                        break;
+                    case 'nakrut_complete':
+                    case 'prank_complete':
+                        showToast(`Завершено! Успешно: ${data.success}, ошибок: ${data.fail}`, 'success');
+                        break;
+                    default:
+                        if (data.success) {
+                            showToast(data.message || 'Успешно!', 'success');
+                        }
+                }
+            } catch (e) {
+                console.error('Ошибка обработки ответа:', e);
             }
         });
 
